@@ -3,7 +3,6 @@ package balance
 import (
 	"database/sql"
 	"errors"
-	"strconv"
 
 	"github.com/Abedmuh/Paimon-bank/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -11,13 +10,19 @@ import (
 )
 
 type SvcInter interface {
-	AuthoBalance(Req Reqbalance, tx *sql.DB, ctx *gin.Context) (bool, error)
+	AuthoBalance(Req string, tx *sql.DB, ctx *gin.Context) (bool, error)
 
 	AddBalance(Req Reqbalance, tx *sql.DB, ctx *gin.Context) error
 	UpdateBalance(Req Reqbalance, tx *sql.DB, ctx *gin.Context) error
 
 	CheckBalance(tx *sql.DB, ctx *gin.Context) error
 	GetBalance(tx *sql.DB, ctx *gin.Context) ([]Resbalance,error)
+
+	AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Context) error
+
+	AddLogTransaction(req Reqbalance, tx *sql.DB, ctx *gin.Context) error
+
+	GetLogBalance(params Params,tx *sql.DB, ctx *gin.Context) ([]Transaction, Params, error)
 }
 
 type SvcImpl struct {
@@ -27,7 +32,7 @@ func NewBalanceService() SvcInter {
 	return &SvcImpl{}
 }
 
-func (s *SvcImpl) AuthoBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) (bool,error) {
+func (s *SvcImpl) AuthoBalance(req string, tx *sql.DB, ctx *gin.Context) (bool,error) {
 	user,_ := ctx.Get("user")
 	reqUser, ok := user.(string)
 	if !ok {
@@ -35,13 +40,12 @@ func (s *SvcImpl) AuthoBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) (bo
 	}
 
 	var id string
-	query := `SELECT id FROM banks 
-		WHERE owner = $1 AND acc_number = $2 AND bank_name = $3
+	query := `SELECT id FROM balances 
+		WHERE owner = $1 AND currency = $2
 	`
 	err := tx.QueryRow(query, 
 		reqUser, 
-		req.SenderBankAccountNumber,
-		req.SenderBankName).Scan(&id)
+		req).Scan(&id)
 	
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -58,35 +62,19 @@ func (s *SvcImpl) AddBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) error
 		return err
 	}
 	idBank := uuid.New().String()
-	idBalance := uuid.New().String()
 
-	queryBank := `INSERT INTO banks (id, owner, name, acc_number)
-	  VALUES ($1, $2, $3, $4)`
+	queryBank := `INSERT INTO balances (id, owner, name, acc_number, currency, balance)
+	  VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err = tx.Exec(queryBank, 
 		idBank,
 		reqUser,
 		req.SenderBankName,
-	  req.SenderBankAccountNumber)
+	  req.SenderBankAccountNumber,
+		req.Currency,
+		req.AddedBalance)
 	if err!= nil {
     return err
   }
-
-	queryBalance := `INSERT INTO balances (id, bank_owner, currency, balance
-		) VALUES ($1, $2, $3, $4)`
-  _, err = tx.Exec(queryBalance,
-		idBalance,
-    idBank,
-    req.Currency,
-    req.AddedBalance)
-	if err!= nil {
-    return err
-  }
-
-	// Tambahkan transaksi baru ke tabel transactions
-	err = s.addTransaction(req, tx, reqUser)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -99,46 +87,37 @@ func (s *SvcImpl) UpdateBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) er
 	query := `
 		UPDATE balances
 		SET balance = balance + $1
-		WHERE bank_owner = (
-			SELECT id
-			FROM banks
-			WHERE owner = $2 AND acc_number = $3 AND name = $4
-		)
-		AND currency = $5
+		WHERE owner = $2 AND currency = $3
 	`
 	_, err = tx.Exec(query,
 		req.AddedBalance,
 		reqUser,
-		req.SenderBankAccountNumber,
-		req.SenderBankName,
 		req.Currency)
 	if err != nil {
 		return err
 	}
 
-	// Tambahkan transaksi baru ke tabel transactions
-	err = s.addTransaction(req, tx, reqUser)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
-func (s *SvcImpl) addTransaction(req Reqbalance, tx *sql.DB, reqUser string) error {
-	id := uuid.New().String()
-	queryTransaction := `
-		INSERT INTO transactions (id, owner, currency, balance, transferProofImg)
-		VALUES ($1, $2, $3, $4, $5)
-	`
-	_, err := tx.Exec(queryTransaction,
-		id,
-		reqUser,
-		req.Currency,
-		strconv.Itoa(int(req.AddedBalance)),
-		req.TransferProofImg)
+func (s *SvcImpl) CheckBalance(tx *sql.DB, ctx *gin.Context) error {
+	reqUser, err := utils.GetUserID(ctx)
 	if err != nil {
 		return err
 	}
+
+	query := `SELECT EXISTS (SELECT 1 FROM balances WHERE owner = $1)`
+
+	var exists bool
+	err = tx.QueryRowContext(ctx, query, reqUser).Scan(&exists)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return errors.New("no balance found")
+	}
+
 	return nil
 }
 
@@ -173,23 +152,120 @@ func (s *SvcImpl) GetBalance(tx *sql.DB, ctx *gin.Context) ([]Resbalance, error)
 	return balances, nil
 }
 
-func (s *SvcImpl) CheckBalance(tx *sql.DB, ctx *gin.Context) error {
+func (s *SvcImpl) AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Context) error {
 	reqUser, err := utils.GetUserID(ctx)
 	if err != nil {
-		return err
+    return err
+  }
+
+	querycheck := `
+		SELECT balance 
+		FROM balances
+		WHERE owner = $1 AND currency = $2
+	`
+	var balance uint64
+	err = tx.QueryRowContext(ctx, querycheck, 
+		reqUser,
+		req.FromCurrency).Scan(&balance)
+	if err!= nil {
+    return err
+  }
+	if balance < req.Balance {
+		return errors.New("out of balance")
 	}
 
-	query := `SELECT EXISTS (SELECT 1 FROM balances WHERE owner = $1)`
-
-	var exists bool
-	err = tx.QueryRowContext(ctx, query, reqUser).Scan(&exists)
+	query := `
+		UPDATE balances
+		SET balance = balance + $1
+		WHERE acc_number = $2 AND name = $3 AND currency = $4
+	`
+	_, err = tx.Exec(query,
+		req.Balance,
+		req.RecipientBankAccountNumber,
+		req.RecipientBankName,
+		req.FromCurrency)
 	if err != nil {
 		return err
-	}
-
-	if !exists {
-		return errors.New("no balance found")
 	}
 
 	return nil
+}
+
+
+func (s *SvcImpl) AddLogTransaction(req Reqbalance, tx *sql.DB, ctx *gin.Context) error {
+	reqUser, err := utils.GetUserID(ctx)
+	if err != nil {
+    return err
+  }
+	id := uuid.New().String()
+	queryTransaction := `
+		INSERT INTO log_transaction (id, owner, balance, currency, transfer_proof, bank_account, bank_name)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+	_, err = tx.Exec(queryTransaction,
+		id,
+		reqUser,
+		req.AddedBalance,
+		req.Currency,
+		req.TransferProofImg,
+	  req.SenderBankAccountNumber,
+    req.SenderBankName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SvcImpl) GetLogBalance(param Params, tx *sql.DB, ctx *gin.Context) ([]Transaction, Params, error) {
+	var transactions []Transaction
+  reqUser, err := utils.GetUserID(ctx)
+  if err != nil {
+		return nil, Params{}, err
+  }
+
+	var totalRows uint16
+	countQuery := `SELECT COUNT(*) FROM log_transaction WHERE owner = $1`
+	err = tx.QueryRowContext(ctx, countQuery, reqUser).Scan(&totalRows)
+	if err != nil {
+			return nil, Params{}, err
+	}
+
+	params := Params{
+		Limit: param.Limit,
+    Offset:  param.Offset,
+		Total: totalRows,
+	}
+
+  query := `SELECT id, balance, currency, transfer_proof, created_at, bank_account, bank_name
+    FROM log_transaction
+    WHERE owner = $1
+		LIMIT $2 OFFSET $3
+  `
+  rows, err := tx.QueryContext(ctx, query, 
+		reqUser, 
+		param.Limit, 
+		param.Offset)
+  if err != nil {
+    return nil, Params{}, err
+  }
+  defer rows.Close()
+	for rows.Next() {
+		var transaction Transaction
+    err := rows.Scan(
+			&transaction.TransactionId, 
+			&transaction.Balance, 
+			&transaction.Currency, 
+			&transaction.TransferProofImg,
+			&transaction.CreatedAt, 
+			&transaction.Source.BankAccountNumber, 
+			&transaction.Source.BankName)
+    if err != nil {
+      return nil, Params{}, err
+    }
+    transactions = append(transactions, transaction)
+	}
+	if err := rows.Err(); err != nil {
+    return nil, Params{}, err
+  }
+	return transactions, params, nil
 }

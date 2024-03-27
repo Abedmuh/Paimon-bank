@@ -16,7 +16,6 @@ type ReqUserReg struct {
 }
 type ReqUserLog struct {
 	Email    string `json:"email"`
-	Name     string `json:"name"`
 	Password string `json:"password"`
 }
 

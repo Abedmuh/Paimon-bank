@@ -1,8 +1,8 @@
-package cmd
+package main
 
 import (
 	"github.com/Abedmuh/Paimon-bank/internal/routes"
-	"github.com/Abedmuh/Paimon-bank/pkg/db"
+	"github.com/Abedmuh/Paimon-bank/pkg/dbconfig"
 	"github.com/Abedmuh/Paimon-bank/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	db, err := db.GetDBConnection()
+	db, err := dbconfig.GetDBConnection()
 	if err!= nil {
     panic(err)
   }
@@ -19,6 +19,8 @@ func main() {
 
 	app := gin.Default()
 	app.Use(middleware.RecoveryMiddleware())
+	app.MaxMultipartMemory = 2 << 20 
+
 	validate:= validator.New()
 
 
@@ -26,6 +28,7 @@ func main() {
 	{
 		routes.UserRoutes(v1, db, validate)
 		routes.BalanceRoutes(v1, db, validate)
-		routes.TransactionRoutes(v1, db, validate)
 	}
+
+	app.Run(":8000")
 }

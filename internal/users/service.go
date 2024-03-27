@@ -3,6 +3,7 @@ package users
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/Abedmuh/Paimon-bank/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -51,6 +52,8 @@ func (us *UserSvcImpl) CreateUser(req ReqUserReg, tx *sql.DB, ctx *gin.Context) 
 }
 
 func (us *UserSvcImpl) LoginUser(userDb User, req ReqUserLog,tx *sql.DB, ctx *gin.Context) (ResUser,error) {
+	fmt.Println(req.Password)
+	fmt.Println(userDb.Password)
 	err := bcrypt.CompareHashAndPassword([]byte(userDb.Password), []byte(req.Password))
 	if err != nil {
 		return ResUser{},errors.New("password salah")
@@ -71,7 +74,7 @@ func (us *UserSvcImpl) LoginUser(userDb User, req ReqUserLog,tx *sql.DB, ctx *gi
 
 func (uc *UserSvcImpl) CheckUserReg(req string, tx *sql.DB, ctx *gin.Context) error {
 	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM users WHERE email = $1 OR phone = $1)`
+	query := `SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)`
 	err := tx.QueryRow(query, req).Scan(&exists)
 	if err != nil {
 		return err
@@ -88,8 +91,8 @@ func (uc *UserSvcImpl) CheckUserLog(req string, tx *sql.DB, ctx *gin.Context) (U
   err := tx.QueryRow(query, req).Scan(
     &userDb.Id, 
     &userDb.Name, 
-    &userDb.Password, 
     &userDb.Email,
+    &userDb.Password, 
 		&userDb.CreatedAt)
   if err!= nil {
     return userDb, err

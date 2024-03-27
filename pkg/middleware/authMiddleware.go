@@ -24,7 +24,6 @@ func Authentication() gin.HandlerFunc {
 		}
 
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-		fmt.Println(tokenString)
 
 		secretKey := viper.GetString("JWT_SECRET_KEY")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

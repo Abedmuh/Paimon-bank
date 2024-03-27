@@ -13,11 +13,15 @@ func BalanceRoutes(route *gin.RouterGroup, db *sql.DB, validate *validator.Valid
 	service := balance.NewBalanceService()
 	controler := balance.NewBalanceController(service, db, validate)
 
+
+	route.Use(middleware.Authentication())
+	route.POST("/transaction", controler.PostTransaction)
+
 	path := route.Group("/balance")
-	path.Use(middleware.Authentication())
 	{
 		path.POST("/", controler.PostBalance)
 		path.GET("/", controler.GetBalance)
+		
 		path.GET("/history", controler.GetHistory)
 	}
 }

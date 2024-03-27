@@ -28,18 +28,27 @@ func (uc *UserCtrlImpl) PostUser(ctx *gin.Context) {
     return
   }
   if err := uc.validate.Struct(req); err!= nil {
-    ctx.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+    ctx.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+			"message": "Fail to validate",
+		})
     return
   }
 
 	if err := uc.service.CheckUserReg(req.Email,uc.DB, ctx); err!= nil {
-    ctx.AbortWithStatusJSON(409, gin.H{"error": err.Error()})
+    ctx.AbortWithStatusJSON(409, gin.H{
+			"error": err.Error(),
+			"message": "Fail to check",
+		})
     return
   }
 
 	res,err := uc.service.CreateUser(req, uc.DB, ctx)
   if  err!= nil {
-    ctx.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+    ctx.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+			"message": "Fail to create",
+		})
     return
   }
   ctx.JSON(200, gin.H{
