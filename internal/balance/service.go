@@ -63,13 +63,11 @@ func (s *SvcImpl) AddBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) error
 	}
 	idBank := uuid.New().String()
 
-	queryBank := `INSERT INTO balances (id, owner, name, acc_number, currency, balance)
-	  VALUES ($1, $2, $3, $4, $5, $6)`
+	queryBank := `INSERT INTO balances (id, owner, currency, balance)
+	  VALUES ($1, $2, $3, $4)`
 	_, err = tx.Exec(queryBank, 
 		idBank,
 		reqUser,
-		req.SenderBankName,
-	  req.SenderBankAccountNumber,
 		req.Currency,
 		req.AddedBalance)
 	if err!= nil {
@@ -176,13 +174,12 @@ func (s *SvcImpl) AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Contex
 
 	query := `
 		UPDATE balances
-		SET balance = balance + $1
-		WHERE acc_number = $2 AND name = $3 AND currency = $4
+		SET balance = balance - $1
+		WHERE owner = $2 AND currency = $3
 	`
 	_, err = tx.Exec(query,
 		req.Balance,
-		req.RecipientBankAccountNumber,
-		req.RecipientBankName,
+		reqUser,
 		req.FromCurrency)
 	if err != nil {
 		return err

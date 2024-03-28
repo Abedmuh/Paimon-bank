@@ -1,0 +1,39 @@
+version: "3.8"
+
+networks:
+  paimonbank:
+    driver: bridge
+
+volumes:
+  api:
+  postgres_data:
+
+services:
+  db:
+    image: postgres:alpine3.19
+    container_name: postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - paimonbank
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+  web:
+    build: .
+    container_name: golangbank
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - paimonbank
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - api:/usr/src/app/

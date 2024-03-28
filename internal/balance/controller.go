@@ -39,7 +39,7 @@ func (c *CtrlImpl) PostBalance(ctx *gin.Context)  {
 	if err := c.validate.Struct(req); err!= nil {
     ctx.AbortWithStatusJSON(400, gin.H{
 			"error": err.Error(),
-			"messsage":  "request doesn’t pass validation",
+			"messsage":  "request doesnt pass validation",
 		})
     return
   }

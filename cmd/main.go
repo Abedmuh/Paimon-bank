@@ -30,5 +30,5 @@ func main() {
 		routes.BalanceRoutes(v1, db, validate)
 	}
 
-	app.Run(":8000")
+	app.Run(":8080")
 }

@@ -1,10 +1,8 @@
 package balance
 
-// main
+// main db
 type Balance struct {
 	Id        string `json:"id"`
-	BankOwner string `json:"bank_owner"`
-	AccNumber string `json:"acc_number"`
 	Name      string `json:"name"`
 	Balance   int64  `json:"balance"`
 	Currency  string `json:"currency"`
