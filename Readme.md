@@ -8,3 +8,5 @@ mingw32-make migrate_up
 testing on k6
 $env:BASE_URL = 'http://localhost:8000'
 k6 run --vus 1 --iterations 1 script.js
+
+migrate -path db/migrations -database "postgresql://abdillah:pass@localhost:3000/paimonbank?sslmode=disable" up

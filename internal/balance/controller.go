@@ -71,7 +71,7 @@ func (c *CtrlImpl) PostBalance(ctx *gin.Context)  {
     }
 	}
 
-	if err := c.service.AddLogTransaction(req, c.DB, ctx); err!= nil {
+	if err := c.service.AddLogBalance(req, c.DB, ctx); err!= nil {
 		ctx.AbortWithStatusJSON(400, gin.H{
 			"error": err.Error(),
 			"message": "Log fail",
@@ -135,6 +135,14 @@ func (c *CtrlImpl) PostTransaction(ctx *gin.Context) {
     ctx.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
     return
   }
+
+	if err := c.service.AddLogTransaction(req, c.DB, ctx); err!= nil {
+		ctx.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+			"message": "Log fail",
+		})
+		return
+	}
   ctx.JSON(200, gin.H{"message": "Transaction created successfully"})
 }
 

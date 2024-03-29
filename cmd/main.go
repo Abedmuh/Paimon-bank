@@ -28,6 +28,7 @@ func main() {
 	{
 		routes.UserRoutes(v1, db, validate)
 		routes.BalanceRoutes(v1, db, validate)
+		routes.ImageRoutes(v1)
 	}
 
 	app.Run(":8080")

@@ -20,7 +20,9 @@ type SvcInter interface {
 
 	AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Context) error
 
-	AddLogTransaction(req Reqbalance, tx *sql.DB, ctx *gin.Context) error
+	AddLogBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) error
+	AddLogTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Context) error
+
 
 	GetLogBalance(params Params,tx *sql.DB, ctx *gin.Context) ([]Transaction, Params, error)
 }
@@ -189,7 +191,7 @@ func (s *SvcImpl) AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Contex
 }
 
 
-func (s *SvcImpl) AddLogTransaction(req Reqbalance, tx *sql.DB, ctx *gin.Context) error {
+func (s *SvcImpl) AddLogBalance(req Reqbalance, tx *sql.DB, ctx *gin.Context) error {
 	reqUser, err := utils.GetUserID(ctx)
 	if err != nil {
     return err
@@ -207,6 +209,28 @@ func (s *SvcImpl) AddLogTransaction(req Reqbalance, tx *sql.DB, ctx *gin.Context
 		req.TransferProofImg,
 	  req.SenderBankAccountNumber,
     req.SenderBankName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (s *SvcImpl) AddLogTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Context) error {
+	reqUser, err := utils.GetUserID(ctx)
+	if err != nil {
+    return err
+  }
+	id := uuid.New().String()
+	queryTransaction := `
+		INSERT INTO log_transaction (id, owner, balance, currency, bank_account, bank_name)
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`
+	_, err = tx.Exec(queryTransaction,
+		id,
+		reqUser,
+		-req.Balance,
+		req.FromCurrency,
+	  req.RecipientBankAccountNumber,
+    req.RecipientBankName)
 	if err != nil {
 		return err
 	}

@@ -7,13 +7,15 @@ networks:
 volumes:
   api:
   postgres_data:
+  prometheus_data:
 
 services:
   db:
     image: postgres:alpine3.19
     container_name: postgres
+    hostname: db
     ports:
-      - "3000:3000"
+      - "8000:5432"
     networks:
       - paimonbank
     volumes:
@@ -23,6 +25,24 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
       - DATABASE_HOST=${DB_HOST}
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - paimonbank
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      # tell the prometheus to use `/etc/prometheus/prometheus.yml`
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      # tell the prometheus to use `/prometheus` as the storage path
+      - "--storage.tsdb.path=/prometheus"
+      # tell prometheus to reload if we hit `http://localhost:9090/-/reload` to reload changes in `./prometheus.yml`
+      - "--web.enable-lifecycle"
   web:
     build: .
     container_name: golangbank
