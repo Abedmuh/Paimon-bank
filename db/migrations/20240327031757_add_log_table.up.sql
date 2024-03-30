@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS log_transaction (
   owner VARCHAR(255) NOT NULL,
   balance VARCHAR(255) NOT NULL,
   currency VARCHAR(16) NOT NULL,
-  transfer_proof VARCHAR(255) NOT NULL,
+  transfer_proof VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   bank_account VARCHAR(255) NOT NULL,
   bank_name VARCHAR(255) NOT NULL

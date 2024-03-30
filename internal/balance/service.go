@@ -163,7 +163,7 @@ func (s *SvcImpl) AddTransaction(req ReqTransaction, tx *sql.DB, ctx *gin.Contex
 		FROM balances
 		WHERE owner = $1 AND currency = $2
 	`
-	var balance uint64
+	var balance int64
 	err = tx.QueryRowContext(ctx, querycheck, 
 		reqUser,
 		req.FromCurrency).Scan(&balance)

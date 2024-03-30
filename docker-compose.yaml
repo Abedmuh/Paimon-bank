@@ -8,6 +8,7 @@ volumes:
   api:
   postgres_data:
   prometheus_data:
+  grafana_data:
 
 services:
   db:
@@ -34,18 +35,33 @@ services:
     networks:
       - paimonbank
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
       - prometheus_data:/prometheus
     command:
       # tell the prometheus to use `/etc/prometheus/prometheus.yml`
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--config.file=/etc/prometheus/prometheus.yaml"
       # tell the prometheus to use `/prometheus` as the storage path
       - "--storage.tsdb.path=/prometheus"
       # tell prometheus to reload if we hit `http://localhost:9090/-/reload` to reload changes in `./prometheus.yml`
       - "--web.enable-lifecycle"
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    hostname: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - paimonbank
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana-configs:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
   web:
     build: .
-    container_name: golangbank
+    container_name: mainapp
+    hostname: web
     restart: always
     ports:
       - "8080:8080"

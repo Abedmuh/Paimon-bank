@@ -16,18 +16,18 @@ type Resbalance struct {
 
 // req
 type ReqTransaction struct {
-	RecipientBankAccountNumber string `json:"recipientBankAccountNumber" validate:"required"`
-	RecipientBankName          string `json:"recipientBankName" validate:"required"`
-	FromCurrency               string `json:"fromCurrency" validate:"required"`
-	Balance                    uint64 `json:"balances" validate:"required"`
+	RecipientBankAccountNumber string `json:"recipientBankAccountNumber" validate:"required,min=5,max=30"`
+	RecipientBankName          string `json:"recipientBankName" validate:"required,min=5,max=30"`
+	FromCurrency               string `json:"fromCurrency" validate:"required,iso4217"`
+	Balance                    int64 `json:"balances" validate:"required"`
 }
 
 type Reqbalance struct {
-	SenderBankAccountNumber string `json:"senderBankAccountNumber"`
-	SenderBankName          string `json:"senderBankName"`
-	AddedBalance            uint64 `json:"addedBalance"`
-	Currency                string `json:"currency"`
-	TransferProofImg        string `json:"transferProofImg"`
+	SenderBankAccountNumber string `json:"senderBankAccountNumber" validate:"required,min=5,max=30"`
+	SenderBankName          string `json:"senderBankName" validate:"required,min=5,max=30"`
+	AddedBalance            uint64 `json:"addedBalance" validate:"required"`
+	Currency                string `json:"currency" validate:"required,iso4217"`
+	TransferProofImg        string `json:"transferProofImg" validate:"required,url"`
 }
 
 // main
@@ -35,7 +35,7 @@ type Transaction struct {
 	TransactionId    string `json:"transactionId"`
 	Balance          int64  `json:"balance"`
 	Currency         string `json:"currency"`
-	TransferProofImg string `json:"transferProofImg"`
+	TransferProofImg *string `json:"transferProofImg"`
 	CreatedAt        string `json:"createdAt"`
 	Source           source
 }
