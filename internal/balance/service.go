@@ -127,9 +127,11 @@ func (s *SvcImpl) GetBalance(tx *sql.DB, ctx *gin.Context) ([]Resbalance, error)
 	if err != nil {
 		return nil, err
 	}
-	query := `SELECT b.currency, b.balance 
-		FROM balances b 
+	query := `SELECT SUM(balance) AS balance, currency  
+		FROM balances 
 		WHERE owner = $1
+		GROUP BY currency
+		ORDER BY balance DESC
 	`
 	rows, err := tx.QueryContext(ctx, query, reqUser)
 	if err != nil {
@@ -139,7 +141,7 @@ func (s *SvcImpl) GetBalance(tx *sql.DB, ctx *gin.Context) ([]Resbalance, error)
 
 	for rows.Next() {
 		var balance Resbalance
-		err := rows.Scan(&balance.Currency, &balance.Balance)
+		err := rows.Scan(&balance.Balance, &balance.Currency)
 		if err != nil {
 			return nil, err
 		}

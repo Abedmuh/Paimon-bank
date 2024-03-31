@@ -2,6 +2,7 @@ package balance
 
 import (
 	"database/sql"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,7 @@ func (c *CtrlImpl) PostBalance(ctx *gin.Context)  {
     ctx.AbortWithStatusJSON(400, gin.H{
 			"error": err.Error(),
 			"messsage":  "request doesnt pass validation",
+			"code": http.StatusBadRequest,
 		})
     return
   }

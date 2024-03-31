@@ -7,6 +7,7 @@ import (
 	"github.com/Abedmuh/Paimon-bank/internal/routes"
 	"github.com/Abedmuh/Paimon-bank/pkg/dbconfig"
 	"github.com/Abedmuh/Paimon-bank/pkg/middleware"
+	"github.com/Abedmuh/Paimon-bank/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,13 +29,12 @@ func main() {
   }
 	defer db.Close()
 
-
 	app := gin.Default()
 	app.Use(middleware.RecoveryMiddleware())
 	app.MaxMultipartMemory = 2 << 20 
 
 	validate:= validator.New()
-
+	validate.RegisterValidation("myUrl", utils.ValidateTransferProof)
 
 	app.Use(GinPrometheusMiddleware())
 	app.GET("/metrics", gin.WrapH(promhttp.Handler()))

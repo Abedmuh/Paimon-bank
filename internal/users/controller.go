@@ -51,7 +51,7 @@ func (uc *UserCtrlImpl) PostUser(ctx *gin.Context) {
 		})
     return
   }
-  ctx.JSON(200, gin.H{
+  ctx.JSON(201, gin.H{
 		"message": "User created successfully",
 		"data": res,
 	})

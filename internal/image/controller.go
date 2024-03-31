@@ -22,6 +22,10 @@ type ImageSvcInter interface {
 type ImageController struct{
 }
 
+type resImg struct{
+	ImageUrl string `json:"imageUrl"`
+}
+
 func NewImageController() ImageSvcInter {
 	return &ImageController{}
 }
@@ -41,8 +45,12 @@ func (ic *ImageController) PostImage( c *gin.Context)  {
 		return
 	}
 
+	res := resImg{
+		ImageUrl: url,
+	}
+
 	c.JSON(200, gin.H{
-    "imageUrl": url,
+    "data": res,
   })
 }
 

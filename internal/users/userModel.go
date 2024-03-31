@@ -21,7 +21,7 @@ type ReqUserLog struct {
 
 // response
 type ResUser struct {
-	Email       string `json:"email"`
 	Name        string `json:"name"`
+	Email       string `json:"email"`
 	AccessToken string `json:"accessToken"`
 }
