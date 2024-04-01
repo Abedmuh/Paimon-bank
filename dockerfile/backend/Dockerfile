@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o main ./main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o main ./cmd/main.go
 
 # Step 2: Use a minimal base image to run the application
 FROM alpine:3.19  
