@@ -46,11 +46,11 @@ services:
     networks:
       - paimonbank
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       # tell the prometheus to use `/etc/prometheus/prometheus.yml`
-      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--config.file=/etc/prometheus/prometheus.yml"
       # tell the prometheus to use `/prometheus` as the storage path
       - "--storage.tsdb.path=/prometheus"
       # tell prometheus to reload if we hit `http://localhost:9090/-/reload` to reload changes in `./prometheus.yml`
