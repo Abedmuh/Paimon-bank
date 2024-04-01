@@ -17,13 +17,14 @@ func GetDBConnection() (*sql.DB, error) {
 	}
 
 	dbHost := viper.GetString("DB_HOST")
-	dbPort := viper.GetInt("DB_PORT")
+	dbPort := viper.GetString("DB_PORT")
 	dbUser := viper.GetString("DB_USERNAME")
 	dbPassword := viper.GetString("DB_PASSWORD")
 	dbName := viper.GetString("DB_NAME")
+	dbParams := viper.GetString("DB_PARAMS")
 
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbHost, dbPort, dbUser, dbPassword, dbName)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?%s",
+		dbUser, dbPassword, dbHost, dbPort, dbName, dbParams )
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
