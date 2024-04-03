@@ -10,16 +10,17 @@ import (
 
 func GetDBConnection() (*sql.DB, error) {
 
+	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println(err.Error())
 	}
 
-	dbHost := viper.GetString("DB_HOST")
-	dbPort := viper.GetString("DB_PORT")
 	dbUser := viper.GetString("DB_USERNAME")
 	dbPassword := viper.GetString("DB_PASSWORD")
+	dbHost := viper.GetString("DB_HOST")
+	dbPort := viper.GetString("DB_PORT")
 	dbName := viper.GetString("DB_NAME")
 	dbParams := viper.GetString("DB_PARAMS")
 
