@@ -2,6 +2,6 @@ global:
   scrape_interval: 15s # By default, scrape targets every 15 seconds.
 
 scrape_configs:
-  - job_name: "local-metrics"
+  - job_name: "my-gin-app"
     static_configs:
-      - targets: ["host.docker.internal:8080"] # Replace <your-application-ip> with the IP address of your application.
+      - targets: ["web:8080"] # Replace <your-application-ip> with the IP address of your application.

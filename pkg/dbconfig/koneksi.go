@@ -10,7 +10,6 @@ import (
 
 func GetDBConnection() (*sql.DB, error) {
 
-	viper.SetConfigFile(".env")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
