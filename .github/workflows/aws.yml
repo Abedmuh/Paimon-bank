@@ -72,12 +72,27 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "${{ secrets.DB_PEM }}" | base64 -d > file.pem
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build \
+            --build-arg PEM_FILE=file.pem \
+            --build-arg "DB_USERNAME=${{ secrets.DB_USERNAME }}" \
+            --build-arg "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+            --build-arg "DB_HOST=${{ secrets.DB_HOST }}" \
+            --build-arg "DB_PORT=${{ secrets.DB_PORT }}" \
+            --build-arg "DB_NAME=${{ secrets.DB_NAME }}" \
+            --build-arg "DB_PARAMS=${{ secrets.DB_PARAMS }}" \
+            --build-arg "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" \
+            --build-arg "JWT_TIME_EXP=${{ secrets.JWT_TIME_EXP }}" \
+            --build-arg "S3_ID=${{ secrets.S3_ID }}" \
+            --build-arg "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" \
+            --build-arg "S3_BASE_URL=${{ secrets.S3_BASE_URL }}" \
+            --build-arg "S3_REGION=${{ secrets.S3_REGION }}" \
+            -t $ECR/$BEC_NAME:$IMAGE_TAG --file ./dockerfile/backend/Dockerfile .
+          docker push $ECR/$BEC_NAME:$IMAGE_TAG
+          echo "image=$ECR/$BEC_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
