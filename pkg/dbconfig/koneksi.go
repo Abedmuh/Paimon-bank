@@ -3,26 +3,19 @@ package dbconfig
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 )
 
 func GetDBConnection() (*sql.DB, error) {
 
-	// viper.SetConfigFile(".env")
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println(err.Error())
-	}
-
-	dbUser := viper.GetString("DB_USERNAME")
-	dbPassword := viper.GetString("DB_PASSWORD")
-	dbHost := viper.GetString("DB_HOST")
-	dbPort := viper.GetString("DB_PORT")
-	dbName := viper.GetString("DB_NAME")
-	dbParams := viper.GetString("DB_PARAMS")
+	dbUser := os.Getenv("DB_USERNAME")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbParams := os.Getenv("DB_PARAMS")
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?%s",
 		dbUser, dbPassword, dbHost, dbPort, dbName, dbParams )
