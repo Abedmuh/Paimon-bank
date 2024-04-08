@@ -84,7 +84,6 @@
   "taskRoleArn": "arn:aws:iam::560918124458:role/projectsprint_ecs_task_role",
   "executionRoleArn": "arn:aws:iam::560918124458:role/projectsprint_ecs_task_execution_role",
   "networkMode": "awsvpc",
-  "revision": 7,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -125,7 +124,5 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-04-07T10:15:06.270Z",
-  "registeredBy": "arn:aws:iam::560918124458:user/projectsprint-tango-redox",
   "tags": []
 }
