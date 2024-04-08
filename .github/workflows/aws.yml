@@ -36,7 +36,7 @@ env:
   ECS_SERVICE: budiman-run-app3 # set this to your Amazon ECS service name
   ECS_CLUSTER: budiman-paimonbank # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION:
-    ./.github/workflow/taskdef.json # set this to the path to your Amazon ECS task definition
+    ./.github/workflows/taskdef.json # set this to the path to your Amazon ECS task definition
     # file, e.g. .aws/task-definition.json
   CONTAINER_NAME:
     budimanbank # set this to the name of the container in the
