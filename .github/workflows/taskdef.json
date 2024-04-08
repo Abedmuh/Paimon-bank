@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:560918124458:task-definition/budiman-task:3",
+  "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:560918124458:task-definition/budiman-task:7",
   "containerDefinitions": [
     {
       "name": "budimanbank",
-      "image": "<IMAGE1_NAME>",
+      "image": "560918124458.dkr.ecr.ap-southeast-1.amazonaws.com/budimanbank:27e679db6aa9aadda7f5416a34ae92f317be7fb7",
       "cpu": 0,
       "portMappings": [
         {
@@ -15,7 +15,56 @@
         }
       ],
       "essential": true,
-      "environment": [],
+      "environment": [
+        {
+          "name": "S3_ID",
+          "value": "${{ secrets.S3_ID }}"
+        },
+        {
+          "name": "DB_USERNAME",
+          "value": "${{ secrets.DB_USERNAME }}"
+        },
+        {
+          "name": "S3_REGION",
+          "value": "${{ secrets.S3_REGION }}1"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "${{ secrets.DB_PORT }}"
+        },
+        {
+          "name": "S3_SECRET_KEY",
+          "value": "${{ secrets.S3_SECRET_KEY }}"
+        },
+        {
+          "name": "DB_NAME",
+          "value": "${{ secrets.DB_NAME }}"
+        },
+        {
+          "name": "S3_BASE_URL",
+          "value": "${{ secrets.S3_BASE_URL }}"
+        },
+        {
+          "name": "JWT_TIME_EXP",
+          "value": "${{ secrets.JWT_TIME_EXP }}"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "${{ secrets.DB_HOST }}"
+        },
+        {
+          "name": "JWT_SECRET_KEY",
+          "value": "${{ secrets.JWT_SECRET_KEY }}"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "${{ secrets.DB_PASSWORD }}"
+        },
+        {
+          "name": "DB_PARAMS",
+          "value": "${{ secrets.DB_PARAMS }}"
+        }
+      ],
       "environmentFiles": [],
       "mountPoints": [],
       "volumesFrom": [],
@@ -37,7 +86,7 @@
   "taskRoleArn": "arn:aws:iam::560918124458:role/projectsprint_ecs_task_role",
   "executionRoleArn": "arn:aws:iam::560918124458:role/projectsprint_ecs_task_execution_role",
   "networkMode": "awsvpc",
-  "revision": 3,
+  "revision": 7,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -78,7 +127,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-04-06T12:54:37.630Z",
+  "registeredAt": "2024-04-07T10:15:06.270Z",
   "registeredBy": "arn:aws:iam::560918124458:user/projectsprint-tango-redox",
   "tags": []
 }

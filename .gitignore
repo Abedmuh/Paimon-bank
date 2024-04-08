@@ -2,3 +2,4 @@
 .air.toml
 air.conf
 *.pem
+tmp
