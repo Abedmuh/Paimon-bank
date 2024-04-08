@@ -35,10 +35,8 @@ env:
   ECR_REPOSITORY: budimanbank # set this to your Amazon ECR repository name
   ECS_SERVICE: budiman-run-app3 # set this to your Amazon ECS service name
   ECS_CLUSTER: budiman-paimonbank # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ./taskdef.json # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME:
-    budimanbank # set this to the name of the container in the
-    # containerDefinitions section of your task definition
+  ECS_TASK_DEFINITION: ./.github/workflows/taskdef.json # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME: budimanbank # set this to the name of the container in the containerDefinitions section of your task definition
 
 permissions:
   contents: read
@@ -91,10 +89,6 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Download taskdef
-        run: |
-          aws ecs describe-task-definition --task-definition task-def-family --query taskDefinition > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
