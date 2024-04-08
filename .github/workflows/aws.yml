@@ -90,22 +90,22 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Update ECS Task Definitions
-        id: task-def
-        env:
-          ECR: ${{ steps.login-ecr.outputs.registry }}
-          BACKEND: ${{ steps.login-ecr.outputs.registry }}\/budimanbank:${{ github.sha }}
-        run: |
-          sed -i "s/$ECR\/budimanbank:latest/$BACKEND/g" $ECS_TASK_DEFINITION
-          aws ecs register-task-definition --cli-input-json file://.github/workflows/taskdef.json
-
-      # - name: Fill in the new image ID in the Amazon ECS task definition
+      # - name: Update ECS Task Definitions
       #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
-      #     container-name: ${{ env.CONTAINER_NAME }}
-      #     image: ${{ steps.build-image.outputs.image }}
+      #   env:
+      #     ECR: ${{ steps.login-ecr.outputs.registry }}
+      #     BACKEND: ${{ steps.login-ecr.outputs.registry }}\/budimanbank:${{ github.sha }}
+      #   run: |
+      #     sed -i "s/$ECR\/budimanbank:latest/$BACKEND/g" $ECS_TASK_DEFINITION
+      #     aws ecs register-task-definition --cli-input-json file://.github/workflows/taskdef.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
 
       # - name: Deploy Amazon ECS task definition
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
