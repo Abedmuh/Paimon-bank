@@ -30,7 +30,6 @@ on:
 env:
   AWS_REGION: ap-southeast-1 # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: budimanbank # set this to your Amazon ECR repository name
-  ECR_PROMETHEUS: budimanbank-prometheus
   ECS_SERVICE: budiman-run-app3 # set this to your Amazon ECS service name
   ECS_CLUSTER: budiman-paimonbank # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ./.github/workflows/taskdef.json # set this to the path to your Amazon ECS task definition
@@ -93,36 +92,49 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+          ECR_PROMETHEUS: budimanbank-prometheus
         run: |
           docker pull prom/prometheus:latest
           docker tag prom/prometheus:latest $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Download task definition
+      - name: Build, tag, and push grafana to Amazon ECR
+        id: build-grafana
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_GRAFANA: budimanbank-grafana
         run: |
-          aws ecs describe-task-definition --task-definition budiman-task --query taskDefinition > task-definition.json
+          docker pull grafana/grafana:latest
+          docker tag prom/prometheus:latest $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
+      # - name: Download task definition
+      #   run: |
+      #     aws ecs describe-task-definition --task-definition budiman-task --query taskDefinition > task-definition.json
 
-      - name: Modify Amazon ECS task definition with second container prometheus
-        id: render-app-container
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          container-name: prometheus
-          image: amazon/amazon-ecs-sample-2:latest
+      # - name: Fill in the new image ID in the Amazon ECS task definition
+      #   id: task-def
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: task-definition.json
+      #     container-name: ${{ env.CONTAINER_NAME }}
+      #     image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      # - name: Modify Amazon ECS task definition with second container prometheus
+      #   id: render-app-container
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     container-name: prometheus
+      #     image: amazon/amazon-ecs-sample-2:latest
+
+      # - name: Deploy Amazon ECS task definition
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
