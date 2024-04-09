@@ -107,7 +107,7 @@ jobs:
           ECR_GRAFANA: budimanbank-grafana
         run: |
           docker pull grafana/grafana:latest
-          docker tag prom/prometheus:latest $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
+          docker tag grafana/grafana:latest $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
