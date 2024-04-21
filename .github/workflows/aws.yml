@@ -1,140 +1,117 @@
-# This workflow will build and push a new container image to Amazon ECR,
-# and then will deploy a new task definition to Amazon ECS, when there is a push to the "main" branch.
-#
-# To use this workflow, you will need to complete the following set-up steps:
-#
-# 1. Create an ECR repository to store your images.
-#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
-#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
-#    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
-#
-# 2. Create an ECS task definition, an ECS cluster, and an ECS service.
-#    For example, follow the Getting Started guide on the ECS console:
-#      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
-#    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
-#    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
-#
-# 3. Store your ECS task definition as a JSON file in your repository.
-#    The format should follow the output of `aws ecs register-task-definition --generate-cli-skeleton`.
-#    Replace the value of the `ECS_TASK_DEFINITION` environment variable in the workflow below with the path to the JSON file.
-#    Replace the value of the `CONTAINER_NAME` environment variable in the workflow below with the name of the container
-#    in the `containerDefinitions` section of the task definition.
-#
+# name: Deploy to Amazon ECS
 
-name: Deploy to Amazon ECS
+# on:
+#   push:
+#     branches: ["main"]
 
-on:
-  push:
-    branches: ["main"]
+# env:
+#   AWS_REGION: ap-southeast-1
+#   ECR_REPOSITORY: budimanbank # set this to your Amazon ECR repository name
+#   ECS_SERVICE: budiman-run-app3 # set this to your Amazon ECS service name
+#   ECS_CLUSTER: budiman-paimonbank # set this to your Amazon ECS cluster name
+#   ECS_TASK_DEFINITION: ./.github/workflows/taskdef.json # set this to the path to your Amazon ECS task definition
+#   CONTAINER_NAME: budimanbank # set this to the name of the container in the containerDefinitions section of your task definition
 
-env:
-  AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: budimanbank # set this to your Amazon ECR repository name
-  ECS_SERVICE: budiman-run-app3 # set this to your Amazon ECS service name
-  ECS_CLUSTER: budiman-paimonbank # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ./.github/workflows/taskdef.json # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME: budimanbank # set this to the name of the container in the containerDefinitions section of your task definition
+# permissions:
+#   contents: read
 
-permissions:
-  contents: read
+# jobs:
+#   deploy:
+#     name: Deploy
+#     runs-on: ubuntu-latest
+#     environment: production
 
-jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    environment: production
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v3
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+#       - name: Build, tag, and push image to Amazon ECR
+#         id: build-image
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           IMAGE_TAG: ${{ github.sha }}
+#         run: |
+#           echo "${{ secrets.DB_PEM }}" | base64 -d > file.pem
+#           # Build a docker container and
+#           # push it to ECR so that it can
+#           # be deployed to ECS.
+#           docker build \
+#             --build-arg PEM_FILE=file.pem \
+#             --build-arg "DB_USERNAME=${{ secrets.DB_USERNAME }}" \
+#             --build-arg "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+#             --build-arg "DB_HOST=${{ secrets.DB_HOST }}" \
+#             --build-arg "DB_PORT=${{ secrets.DB_PORT }}" \
+#             --build-arg "DB_NAME=${{ secrets.DB_NAME }}" \
+#             --build-arg "DB_PARAMS=${{ secrets.DB_PARAMS }}" \
+#             --build-arg "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" \
+#             --build-arg "JWT_TIME_EXP=${{ secrets.JWT_TIME_EXP }}" \
+#             --build-arg "S3_ID=${{ secrets.S3_ID }}" \
+#             --build-arg "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" \
+#             --build-arg "S3_BASE_URL=${{ secrets.S3_BASE_URL }}" \
+#             --build-arg "S3_REGION=${{ secrets.S3_REGION }}" \
+#             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          echo "${{ secrets.DB_PEM }}" | base64 -d > file.pem
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
-          docker build \
-            --build-arg PEM_FILE=file.pem \
-            --build-arg "DB_USERNAME=${{ secrets.DB_USERNAME }}" \
-            --build-arg "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
-            --build-arg "DB_HOST=${{ secrets.DB_HOST }}" \
-            --build-arg "DB_PORT=${{ secrets.DB_PORT }}" \
-            --build-arg "DB_NAME=${{ secrets.DB_NAME }}" \
-            --build-arg "DB_PARAMS=${{ secrets.DB_PARAMS }}" \
-            --build-arg "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" \
-            --build-arg "JWT_TIME_EXP=${{ secrets.JWT_TIME_EXP }}" \
-            --build-arg "S3_ID=${{ secrets.S3_ID }}" \
-            --build-arg "S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}" \
-            --build-arg "S3_BASE_URL=${{ secrets.S3_BASE_URL }}" \
-            --build-arg "S3_REGION=${{ secrets.S3_REGION }}" \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+#       - name: Build, tag, and push prometheus to Amazon ECR
+#         id: build-prometheus
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           IMAGE_TAG: ${{ github.sha }}
+#           ECR_PROMETHEUS: budimanbank-prometheus
+#         run: |
+#           docker pull prom/prometheus:latest
+#           docker tag prom/prometheus:latest $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
+#           docker push $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
+#           echo "image=$ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Build, tag, and push prometheus to Amazon ECR
-        id: build-prometheus
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-          ECR_PROMETHEUS: budimanbank-prometheus
-        run: |
-          docker pull prom/prometheus:latest
-          docker tag prom/prometheus:latest $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_PROMETHEUS:$IMAGE_TAG" >> $GITHUB_OUTPUT
+#       - name: Build, tag, and push grafana to Amazon ECR
+#         id: build-grafana
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           IMAGE_TAG: ${{ github.sha }}
+#           ECR_GRAFANA: budimanbank-grafana
+#         run: |
+#           docker pull grafana/grafana:latest
+#           docker tag grafana/grafana:latest $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
+#           docker push $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
+#           echo "image=$ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Build, tag, and push grafana to Amazon ECR
-        id: build-grafana
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-          ECR_GRAFANA: budimanbank-grafana
-        run: |
-          docker pull grafana/grafana:latest
-          docker tag grafana/grafana:latest $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_GRAFANA:$IMAGE_TAG" >> $GITHUB_OUTPUT
+#       - name: Download task definition
+#         run: |
+#           aws ecs describe-task-definition --task-definition budiman-task --query taskDefinition > task-definition.json
 
-      # - name: Download task definition
-      #   run: |
-      #     aws ecs describe-task-definition --task-definition budiman-task --query taskDefinition > task-definition.json
+#       - name: Fill in the new image ID in the Amazon ECS task definition
+#         id: task-def
+#         uses: aws-actions/amazon-ecs-render-task-definition@v1
+#         with:
+#           task-definition: task-definition.json
+#           container-name: ${{ env.CONTAINER_NAME }}
+#           image: ${{ steps.build-image.outputs.image }}
 
-      # - name: Fill in the new image ID in the Amazon ECS task definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: task-definition.json
-      #     container-name: ${{ env.CONTAINER_NAME }}
-      #     image: ${{ steps.build-image.outputs.image }}
+#       - name: Modify Amazon ECS task definition with second container prometheus
+#         id: render-app-container
+#         uses: aws-actions/amazon-ecs-render-task-definition@v1
+#         with:
+#           task-definition: ${{ steps.task-def.outputs.task-definition }}
+#           container-name: prometheus
+#           image: amazon/amazon-ecs-sample-2:latest
 
-      # - name: Modify Amazon ECS task definition with second container prometheus
-      #   id: render-app-container
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     container-name: prometheus
-      #     image: amazon/amazon-ecs-sample-2:latest
-
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ env.ECS_SERVICE }}
-      #     cluster: ${{ env.ECS_CLUSTER }}
-      #     wait-for-service-stability: true
+#       - name: Deploy Amazon ECS task definition
+#         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#         with:
+#           task-definition: ${{ steps.task-def.outputs.task-definition }}
+#           service: ${{ env.ECS_SERVICE }}
+#           cluster: ${{ env.ECS_CLUSTER }}
+#           wait-for-service-stability: true

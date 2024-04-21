@@ -18,180 +18,32 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
+      "collapsed": false,
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 1,
+        "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 1,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(go_goroutines{instance=\"web:8080\", job=\"my-gin-app\"}[$__rate_interval])",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Saturation",
-      "type": "stat"
+      "id": 4,
+      "panels": [],
+      "title": "General",
+      "type": "row"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
+        "uid": "bdiw59ars16o0c"
       },
+      "description": "Merupakan RPS tinggal jumlah waktu dibagi dengan value yang ditampilkan",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.4.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(http_request_histogram_bucket{path=\"/v1/balance/\", status=\"Internal Server Error\"}[10m]))",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(http_request_histogram_bucket{path=\"/v1/transaction\", status=\"Internal Server Error\"}[10m]))",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "B",
-          "useBackend": false
-        }
-      ],
-      "title": "Errors",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
             "axisBorderShow": false,
@@ -201,16 +53,16 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 25,
-            "gradientMode": "none",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -219,7 +71,7 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -246,7 +98,107 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 1
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bdiw59ars16o0c"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(rate(http_request_histogram_count[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "RPS",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "bdiw59ars16o0c"
+      },
+      "description": "how much proccess",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
       },
       "id": 6,
       "options": {
@@ -265,107 +217,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.5, rate(http_request_histogram_bucket[$__rate_interval]))",
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Latency P50",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
-      },
-      "description": "- Route Latency P95, P90, P50\n",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 25,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "hidden",
-          "placement": "right",
-          "showLegend": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
+            "uid": "bdiw59ars16o0c"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.9, rate(http_request_histogram_bucket[$__rate_interval]))",
+          "expr": "sum(go_goroutines{job=\"my-gin-app\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -375,13 +231,26 @@
           "useBackend": false
         }
       ],
-      "title": "Latency P90",
+      "title": "Go routine",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "panels": [],
+      "title": "Traffic",
+      "type": "row"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
+        "uid": "bdiw59ars16o0c"
       },
       "fieldConfig": {
         "defaults": {
@@ -396,7 +265,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 25,
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -414,7 +283,7 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -441,15 +310,15 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 10
       },
-      "id": 5,
+      "id": 2,
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "right",
-          "showLegend": false
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -460,25 +329,46 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
+            "uid": "bdiw59ars16o0c"
           },
+          "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, rate(http_request_histogram_bucket[$__rate_interval]))",
+          "expr": "sum(rate(http_request_histogram_count{path=\"/v1/balance/\", method=\"POST\"}[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bdiw59ars16o0c"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(rate(http_request_histogram_count{path=\"/v1/transaction\", method=\"POST\"}[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
-          "refId": "A"
+          "refId": "B",
+          "useBackend": false
         }
       ],
-      "title": "Latency P95",
+      "title": "Transaction",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "adh73vm3sy0owe"
+        "uid": "bdiw59ars16o0c"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -537,31 +427,30 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 16
+        "y": 10
       },
-      "id": 3,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "right",
-          "showLegend": false
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
+            "uid": "bdiw59ars16o0c"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum(rate(http_request_histogram_count{path=\"/v1/balance/\", status=\"OK\"}[$__rate_interval]))",
+          "expr": "sum(rate(http_request_histogram_count{status=\"Internal Server Error\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -569,47 +458,134 @@
           "range": true,
           "refId": "A",
           "useBackend": false
+        }
+      ],
+      "title": "Errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "bdiw59ars16o0c"
+      },
+      "description": "artinya 90% selesai dalam waktu tertentu dan 10% selesai dengan telat",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bdiw59ars16o0c"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.9, rate(http_request_histogram_bucket{path=\"/v1/balance/\", method=\"POST\"}[$__rate_interval]))",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{balance}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
+            "uid": "bdiw59ars16o0c"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum(rate(http_request_histogram_count{path=\"/v1/transaction\", status=\"OK\"}[$__rate_interval]))",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.9, rate(http_request_histogram_bucket{path=\"/v1/transaction\", method=\"POST\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "interval": "",
+          "legendFormat": "{{balance}}",
           "range": true,
           "refId": "B",
           "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "adh73vm3sy0owe"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(rate(http_request_histogram_count{path=\"/v1/user/login\", status=\"OK\"}[$__rate_interval]))",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "C",
-          "useBackend": false
         }
       ],
-      "title": "Traffics",
+      "title": "P90",
       "type": "timeseries"
     }
   ],
-  "refresh": "5s",
+  "refresh": "auto",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -621,8 +597,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "PaimonBank",
-  "uid": "adhc0s3ar5fcwc",
+  "title": "Paimonbank",
+  "uid": "bdiwbblgw4ttse",
   "version": 2,
   "weekStart": ""
 }
