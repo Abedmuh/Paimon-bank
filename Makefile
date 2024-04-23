@@ -6,7 +6,7 @@ PG_PORT := $(or $(PG_PORT), 5432)
 PG_DATABASE := $(or $(PG_DATABASE), paimonbank)
 
 build:
-	GOARCH=amd64 GOOS=linux go build -o main
+	go build -o main
 
 migrate_up:
 	migrate -path db/migrations -database "postgresql://$(PG_USERNAME):$(PG_PASSWORD)@$(PG_HOST):$(PG_PORT)/$(PG_DATABASE)?sslmode=disable" up

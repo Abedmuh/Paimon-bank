@@ -1,14 +1,22 @@
-drop database paimonbank;
-create database paimonbank;
-GRANT ALL ON DATABASE paimonbank TO abdillah;
-ALTER DATABASE paimonbank OWNER TO abdillah;
+### What this app do?
 
-mingw32-make migrate_up
+This project was a backend restfull api with golang it receive request and respons it with JSON. the app was replica for banking apps.
 
-testing on k6
-$env:BASE_URL = 'http://localhost:8080'
-k6 run --vus 1 --iterations 1 script.js
+### command apps
 
+yout can use makefile as well but here the manual, all of these was on run on dev mode. for prod watch your .env
+
+```
+//build
+go build -o main
+
+//migrate up
 migrate -path db/migrations -database "postgresql://abdillah:pass@localhost:5432/paimonbank?sslmode=disable" up
 
-migrate -path ./db/migrations -database "postgres://p_tangoredox:iFaph6iarahBahcuethee0Ue7nee9ejie@projectsprint-db.cavsdeuj9ixh.ap-southeast-1.rds.amazonaws.com:5432/tangoredox?sslmode=verify-full&sslrootcert=ap-southeast-1-bundle.pem" up
+//migrate down
+migrate -path db/migrations -database "postgresql://abdillah:pass@localhost:5432/paimonbank?sslmode=disable" down
+
+testing on k6 with windows on powershell
+$env:BASE_URL = 'http://localhost:8080'
+k6 run --vus 1 --iterations 1 script.js
+```
