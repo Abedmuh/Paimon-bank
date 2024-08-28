@@ -25,21 +25,6 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
-  db:
-    image: postgres:alpine3.19
-    container_name: postgres
-    hostname: db
-    ports:
-      - "8000:5432"
-    networks:
-      - paimonbank
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - DATABASE_HOST=${DB_HOST}
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -64,8 +49,6 @@ services:
       - "8080:8080"
     networks:
       - paimonbank
-    depends_on:
-      - db
     env_file:
       - .env
     volumes:

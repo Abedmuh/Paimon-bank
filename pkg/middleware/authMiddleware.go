@@ -30,12 +30,12 @@ func Authentication() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-				return []byte(secretKey), nil
+			return []byte(secretKey), nil
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Unauthenticated"})
 		}
-		
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user", claims["user"])
 		} else {

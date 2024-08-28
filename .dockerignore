@@ -3,3 +3,5 @@
 .gitignore
 Makefile
 *.md
+tmp
+*.exe

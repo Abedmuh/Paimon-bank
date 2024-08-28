@@ -10,16 +10,18 @@ import (
 )
 
 func GetDBConnection() (*sql.DB, error) {
-	
+
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Printf("Error reading .env file: %v\n", err)
-			log.Println("Switching to environment variables...")
+			log.Println("No .env file found, switching to environment variables...")
 		} else {
-			log.Fatalf("file found but error: %v\n", err)
+			log.Fatalf("Error reading .env file: %v\n", err)
 		}
-	}    
+	}
 
 	dbUser := viper.GetString("DB_USERNAME")
 	dbPassword := viper.GetString("DB_PASSWORD")
@@ -29,7 +31,7 @@ func GetDBConnection() (*sql.DB, error) {
 	dbParams := viper.GetString("DB_PARAMS")
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?%s",
-		dbUser, dbPassword, dbHost, dbPort, dbName, dbParams )
+		dbUser, dbPassword, dbHost, dbPort, dbName, dbParams)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
